@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build:
-    name: Compilar APK
+    name: Compilar Terminal OS JARVIS
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -25,11 +25,16 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Configurar Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Instalar ferramentas Android
+      - name: Verificar Android SDK
         run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          adb version || true
+          sdkmanager --version
+
+      - name: Instalar componentes Android
+        run: |
+          yes | sdkmanager --licenses
           sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Configurar Gradle
@@ -47,7 +52,7 @@ jobs:
       - name: Compilar APK
         run: gradle --no-daemon :app:assembleDebug
 
-      - name: Publicar APK para download
+      - name: Publicar APK
         uses: actions/upload-artifact@v4
         with:
           name: terminal-os-jarvis-apk
